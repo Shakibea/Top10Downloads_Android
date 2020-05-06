@@ -9,10 +9,10 @@ class ParseApplication {
     private val TAG = "ParseApplication"
     val applications = ArrayList<FeedEntry>()
 
-    var status = true
-    var inEntry = false
-    var textValue = ""
-    var gotImage = false
+    private var status = true
+    private var inEntry = false
+    private var textValue = ""
+    private var gotImage = false
 
     fun parse(xmlData: String): Boolean {
         Log.d(TAG, "Parse is Called")
@@ -25,19 +25,19 @@ class ParseApplication {
             xpp.setInput(xmlData.reader())
             var eventType = xpp.eventType
             var currentRecord = FeedEntry()
-            while(eventType != XmlPullParser.END_DOCUMENT){
+            while (eventType != XmlPullParser.END_DOCUMENT) {
                 val tagName = xpp.name?.toLowerCase()
 
-                when(eventType){
+                when (eventType) {
                     XmlPullParser.START_TAG -> {
                         Log.d(TAG, "Parse: Starting Tag for $tagName")
-                        if(tagName == "entry"){
+                        if (tagName == "entry") {
                             inEntry = true
 
                             //setting image
-                        }else if ((tagName == "image") && inEntry){
+                        } else if ((tagName == "image") && inEntry) {
                             val imageResolution = xpp.getAttributeValue(null, "height")
-                            if(imageResolution.isNotEmpty()){
+                            if (imageResolution.isNotEmpty()) {
                                 gotImage = imageResolution == "53"
                             }
                         }
@@ -47,8 +47,8 @@ class ParseApplication {
 
                     XmlPullParser.END_TAG -> {
                         Log.d(TAG, "Parse: Ending tag for $tagName")
-                        if(inEntry){
-                            when(tagName){
+                        if (inEntry) {
+                            when (tagName) {
                                 "entry" -> {
                                     applications.add(currentRecord)
                                     inEntry = false
@@ -59,7 +59,7 @@ class ParseApplication {
                                 "artist" -> currentRecord.artist = textValue
                                 "releasedate" -> currentRecord.releaseDate = textValue
                                 "summary" -> currentRecord.summary = textValue
-                                "image" -> if(gotImage) currentRecord.imageUrl = textValue
+                                "image" -> if (gotImage) currentRecord.imageUrl = textValue
                             }
                         }
                     }
@@ -67,12 +67,13 @@ class ParseApplication {
                 eventType = xpp.next()
             }
 
-            for(app in applications){
-                Log.d(TAG, "****************")
-                Log.d(TAG, app.toString())
-            }
+            //show in logcat separation
+//            for (app in applications) {
+//                Log.d(TAG, "****************")
+//                Log.d(TAG, app.toString())
+//            }
 
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             status = false
         }
